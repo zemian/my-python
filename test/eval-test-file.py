@@ -1,3 +1,3 @@
-with open('../temp/test.py') as fh:
-    data = {'foo': "Hello"}
-    exec(fh.read(), data)
+import importlib
+test = importlib.import_module('test')
+print(test.hi())
