@@ -1,4 +1,5 @@
-myvenv/
+__pycache__/
+venv*/
+test/test.py
 temp/
 .idea/
-test/test.py
