@@ -1,5 +1,5 @@
 import importlib
-import test
+import selenium_tests
 from selenium.webdriver import Chrome, ChromeOptions
 
 options = ChromeOptions()
@@ -13,6 +13,6 @@ while True:
         driver.quit()
         break
 
-    # test = importlib.import_module('test')
-    importlib.reload(test)
-    test.test_driver(driver)
+    # selenium_tests = importlib.import_module('selenium_tests')
+    importlib.reload(selenium_tests)
+    selenium_tests.test_driver(driver)
