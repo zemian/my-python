@@ -10,5 +10,4 @@ Explore core python programming
 
 Now we can explore 3rd party libraries, eg:
 
-    pip install django
-
+    pip install mysql-connector-python
