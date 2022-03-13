@@ -10,4 +10,4 @@ Explore core python programming
 
 Now we can explore 3rd party libraries, eg:
 
-    pip install mysql-connector-python
+    pip install mysql-connector-python pytz english-words
