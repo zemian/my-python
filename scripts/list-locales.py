@@ -2,6 +2,8 @@
 # https://stackoverflow.com/questions/53320311/how-do-i-find-all-available-locales-in-python
 #
 import locale
-locales = locale.locale_alias
-for (name, locale) in locales.items():
-    print(name, locale)
+locales = list(locale.locale_alias.keys())
+locales.sort()
+for locale in locales:
+    print(locale)
+print(f"Total {len(locales)} locales found.")
