@@ -1,5 +1,6 @@
 # Parse git log export file into JSON format
 import json, sys, os
+import sqlite3
 
 def parse_record(lines):
 	record = {}
@@ -67,6 +68,53 @@ def export_git_lot(output_file):
 	print(f"Command: {cmd}")
 	os.system(cmd)
 
+def create_dbfile(json_output_file):
+	db_file = os.path.splitext(json_output_file)[0] + ".sqlite3"
+	print(f"Creating dbfile: {db_file}")
+	con = sqlite3.connect(db_file)
+	with con:
+		cur = con.cursor()
+
+		# create table
+		cur.execute("""
+			CREATE TABLE commits (
+				commit_id TEXT PRIMARY KEY,
+				author TEXT,
+				date DATETIME,
+				message TEXT
+			)
+		""")
+		con.commit()
+
+		cur.execute("""
+			CREATE TABLE files (
+				commit_id TEXT,
+				file TEXT
+			)
+		""")
+		con.commit()
+
+		with open(json_output_file, 'r') as fh:
+			records = json.loads(fh.read())
+			for record in records:
+				cur.execute("""
+					INSERT INTO commits(commit_id, author, date, message) 
+					VALUES (?, ?, ?, ?)
+					""", [
+						record['COMMIT'],
+						record['AUTHOR'],
+						record['DATE'],
+						record['MESSAGE']
+					])
+
+				cur.executemany("""
+					INSERT INTO files(commit_id, file) 
+					VALUES (?, ?)
+					""", [(record['COMMIT'], file) for file in record['FILES']])
+
+				con.commit()
+			print(f"Total {len(records)} records inserted into DB.")
+
 def main():
 	output_file = sys.argv[1] if len(sys.argv) > 1 else "commits.json"
 	git_export_file = output_file + "_git-export.txt"
@@ -75,6 +123,10 @@ def main():
 	print(f"Removing {git_export_file}")
 	os.remove(git_export_file)
 	print(f"Export completed to {output_file}")
+	create_dbfile(output_file)
+
+	#print(f"Removing {output_file}")
+	#os.remove(output_file)
 
 if __name__ == "__main__":
 	main()
