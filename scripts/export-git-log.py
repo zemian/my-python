@@ -43,7 +43,7 @@ def parse_record(lines):
 	return record
 
 
-def parse_git_export_text_to_json(git_export_file, json_output_file):
+def parse_git_export_to_json(git_export_file, json_output_file):
 	print(f"Parsing git export: {git_export_file}")
 	records = []
 	record_lines = []
@@ -69,9 +69,9 @@ def export_git_lot(output_file):
 
 def main():
 	output_file = sys.argv[1] if len(sys.argv) > 1 else "commits.json"
-	git_export_file = "." + output_file + ".git-export.txt"
+	git_export_file = output_file + "_git-export.txt"
 	export_git_lot(git_export_file)
-	parse_git_export_text_to_json(git_export_file, output_file)
+	parse_git_export_to_json(git_export_file, output_file)
 	print(f"Removing {git_export_file}")
 	os.remove(git_export_file)
 	print(f"Export completed to {output_file}")
