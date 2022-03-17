@@ -79,7 +79,8 @@ def create_dbfile(json_output_file):
 		cur.execute("""
 			CREATE TABLE commits (
 				commit_id TEXT PRIMARY KEY,
-				author TEXT,
+				author_name TEXT,
+				author_email TEXT,
 				date DATETIME,
 				message TEXT
 			)
@@ -97,12 +98,17 @@ def create_dbfile(json_output_file):
 		with open(json_output_file, 'r') as fh:
 			records = json.loads(fh.read())
 			for record in records:
+				words = record['AUTHOR'].split(' <')
+				author_name = words[0]
+				author_email = words[1].split('>')[0]
+
 				cur.execute("""
-					INSERT INTO commits(commit_id, author, date, message) 
-					VALUES (?, ?, ?, ?)
+					INSERT INTO commits(commit_id, author_name, author_email, date, message) 
+					VALUES (?, ?, ?, ?, ?)
 					""", [
 						record['COMMIT'],
-						record['AUTHOR'],
+						author_name,
+						author_email,
 						record['DATE'],
 						record['MESSAGE']
 					])
