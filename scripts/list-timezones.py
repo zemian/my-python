@@ -6,7 +6,7 @@
 # for timeZone in pytz.all_timezones:
 #     print(timeZone)
 
-# Starging python 3.9, we have "zoneinfo" package
+# Starting python 3.9, we have "zoneinfo" package
 import zoneinfo
 timezones = list(zoneinfo.available_timezones())
 timezones.sort()
