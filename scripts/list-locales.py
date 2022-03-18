@@ -45,3 +45,9 @@ print(f"Country count: {len(summary_counts['country'])}")
 print(f"Encoding count: {len(summary_counts['encoding'])}")
 print(f"Script count: {len(summary_counts['script'])}")
 
+# Output by Python 3.9.10
+# ===Summary counts
+# Language count: 203
+# Country count: 156
+# Encoding count: 46
+# Script count: 4
