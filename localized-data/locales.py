@@ -1,7 +1,7 @@
 import sqlite3
 import locale, re
 
-DB_FILE = 'localetz.db'
+DB_FILE = 'localized-data.sqlite3'
 
 def get_locales():
     locales = []
