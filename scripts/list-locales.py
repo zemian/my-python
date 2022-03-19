@@ -1,7 +1,8 @@
 # https://stackoverflow.com/questions/19709026/how-can-i-list-all-available-windows-locales-in-python-console
 # https://stackoverflow.com/questions/53320311/how-do-i-find-all-available-locales-in-python
 #
-import locale, re
+import locale
+import re
 from collections import defaultdict
 
 #locale._print_locale()
@@ -30,23 +31,23 @@ def parse_locale_manually():
         if len(lang) < 2:
             continue
 
-        locale = {'lang': lang}
+        record = {'lang': lang}
         summary_counts['lang'].add(lang)
 
         if len(country_list) > 0:
-            locale['country'] = country_list[0]
-            summary_counts['country'].add(locale['country'])
+            record['country'] = country_list[0]
+            summary_counts['country'].add(record['country'])
 
         if len(encoding_list) > 0:
             encoding, *script_list = encoding_list[0].split('@', 2)
-            locale['encoding'] = encoding
-            summary_counts['encoding'].add(locale['encoding'])
+            record['encoding'] = encoding
+            summary_counts['encoding'].add(record['encoding'])
 
             if len(script_list) > 0:
-                locale['script'] = script_list[0]
-                summary_counts['script'].add(locale['script'])
+                record['script'] = script_list[0]
+                summary_counts['script'].add(record['script'])
 
-        print(locale)
+        print(record)
 
     print("===Summary counts")
     print(f"Language count: {len(summary_counts['lang'])}")
