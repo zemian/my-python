@@ -11,10 +11,11 @@ from collections import defaultdict
 def parse_locale_with_regex():
     for name in locale.locale_alias.values():
         # The "(?:){0,1}" pattern is for non-capturing group
-        m = re.match('(\w\w)_(\w\w)(?:\.+(.+)){0,1}(?:@(\w+)){0,1}', name)
+        m = re.match('(\w\w)_(\w\w)\.([\w-]+)(?:@(\w+)){0,1}', name)
         if m:
-            record = dict(zip(('lang', 'country', 'encoding', 'script'), m.groups()))
-            print(record)
+            # record = dict(zip(('lang', 'country', 'encoding', 'script'), m.groups()))
+            # print(record)
+            print(m.groups())
 
 def parse_locale_manually():
     # Example value: zh_TW.big5 ir tt_RU.UTF-8@iqtelif
