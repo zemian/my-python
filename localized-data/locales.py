@@ -37,6 +37,11 @@ def populate_db():
             VALUES(:lang, :country, :encoding, :script)
             ''', record)
 
-init_db()
-populate_db()
-print("db created")
+
+def main():
+    init_db()
+    populate_db()
+    print("Locales table populated")
+
+
+main()
