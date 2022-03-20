@@ -5,12 +5,12 @@ import mysql.connector
 with mysql.connector.connect(database='testdb', user='zemian', password='test123') as conn:
     with conn.cursor() as cur:
         # Get VARCHAR type data
-        cur.execute('SELECT name FROM testtypes WHERE id = %s', (1,))
+        cur.execute('SELECT name FROM testtypes WHERE id = %s', (101,))
         col = cur.fetchone()[0]
         print(['Query VARCHAR id=1', col, type(col)])
 
         # Get NULL result
-        cur.execute('SELECT name FROM testtypes WHERE id = %s', (3,))
+        cur.execute('SELECT name FROM testtypes WHERE id = %s', (103,))
         col = cur.fetchone()[0]
         print(['Query VARCHAR id=3', col, type(col)])
 
