@@ -6,7 +6,10 @@ import us
 import pytz
 from datetime import datetime, timedelta, timezone
 
-DB_FILE = 'localized-data.sqlite3'
+
+def get_conn():
+    return sqlite3.connect('localized-data.sqlite3')
+
 
 def get_locales():
     locales = []
@@ -20,10 +23,10 @@ def get_locales():
 
 
 def create_locales_table():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         cur = conn.cursor()
         cur.executescript('''
-        CREATE TABLE IF NOT EXISTS locales(
+        CREATE TABLE locales(
             id INTEGER PRIMARY KEY,
             lang TEXT NOT NULL,
             country TEXT NULL,
@@ -35,7 +38,7 @@ def create_locales_table():
 
 
 def insert_locales():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         cur = conn.cursor()
         locales = get_locales()
         for record in locales:
@@ -47,7 +50,7 @@ def insert_locales():
 
 
 def create_country_tables():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         conn.executescript('''
         CREATE TABLE countries(code TEXT primary key, long_code TEXT, name TEXT, official_name TEXT, common_name TEXT, flag TEXT);
         CREATE TABLE languages(code TEXT primary key, long_code TEXT, name TEXT);
@@ -58,7 +61,7 @@ def create_country_tables():
 
 
 def insert_country_tables():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         cur = conn.cursor()
 
         for country in pycountry.countries:
@@ -96,7 +99,7 @@ def insert_country_tables():
 
 
 def create_us_states_tables():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         conn.executescript('''
         CREATE TABLE us_states (
             abbr TEXT primary key, 
@@ -122,7 +125,7 @@ def create_us_states_tables():
 
 
 def insert_us_states_tables():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         cur = conn.cursor()
         for state in us.states.STATES:
             cur.execute('''INSERT INTO us_states(
@@ -159,7 +162,7 @@ def insert_us_states_tables():
 
 
 def create_tz_tables():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         conn.executescript('''
         CREATE TABLE tz (
             id INTEGER primary key, 
@@ -177,7 +180,7 @@ def create_tz_tables():
 
 
 def insert_tz_tables():
-    with sqlite3.connect(DB_FILE) as conn:
+    with get_conn() as conn:
         cur = conn.cursor()
         fmt = '%Z%z'
         for tz_name in pytz.all_timezones:
