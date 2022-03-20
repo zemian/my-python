@@ -50,10 +50,10 @@ def insert_locales(conn, sql=None):
 
 def create_country_tables(conn):
     conn.executescript('''
-    CREATE TABLE countries(code TEXT primary key, long_code TEXT, name TEXT, official_name TEXT, common_name TEXT, flag TEXT);
-    CREATE TABLE languages(code TEXT primary key, long_code TEXT, name TEXT);
-    CREATE TABLE currencies(code TEXT primary key, name TEXT);
-    CREATE TABLE scripts(code TEXT primary key, name TEXT);
+    CREATE TABLE countries(id INTEGER PRIMARY KEY, code TEXT, long_code TEXT, name TEXT, official_name TEXT, common_name TEXT, flag TEXT);
+    CREATE TABLE languages(id INTEGER PRIMARY KEY, code TEXT, long_code TEXT, name TEXT);
+    CREATE TABLE currencies(id INTEGER PRIMARY KEY, code TEXT, name TEXT);
+    CREATE TABLE scripts(id INTEGER PRIMARY KEY, code TEXT, name TEXT);
     ''')
     print("Country tables are ready")
 
@@ -106,7 +106,8 @@ def insert_country_tables(conn, countries_sql=None, languages_sql=None, scripts_
 def create_us_states_tables(conn):
     conn.executescript('''
     CREATE TABLE us_states (
-        abbr TEXT primary key, 
+        id INTEGER PRIMARY KEY, 
+        abbr TEXT, 
         name TEXT,
         fips TEXT,
         is_territory BOOLEAN,
@@ -120,7 +121,7 @@ def create_us_states_tables(conn):
         name_metaphone TEXT
     );
     CREATE TABLE us_states_time_zones (
-        id INTEGER primary key,
+        id INTEGER PRIMARY KEY,
         abbr TEXT,
         time_zone TEXT
     );
@@ -169,13 +170,13 @@ def insert_us_states_tables(conn, sql=None):
 def create_tz_tables(conn):
     conn.executescript('''
     CREATE TABLE tz (
-        id INTEGER primary key, 
+        id INTEGER PRIMARY KEY, 
         zone TEXT,
         format TEXT,
         is_common BOOLEAN
     );
     CREATE TABLE tz_countries (
-        id INTEGER primary key,
+        id INTEGER PRIMARY KEY,
         country TEXT,
         time_zone TEXT
     );
