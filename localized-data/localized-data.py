@@ -4,8 +4,7 @@ import re
 import pycountry
 import us
 import pytz
-from datetime import datetime, timedelta, timezone
-
+from datetime import datetime, timezone
 
 def get_conn():
     return sqlite3.connect('localized-data.sqlite3')
@@ -36,14 +35,16 @@ def create_locales_table(conn):
     print("Locales table is ready")
 
 
-def insert_locales(conn):
+def insert_locales(conn, sql=None):
     cur = conn.cursor()
     locales = get_locales()
-    for record in locales:
-        cur.execute('''
+    if not sql:
+        sql = '''
         INSERT INTO locales(lang, country, encoding, script)
         VALUES(:lang, :country, :encoding, :script)
-        ''', record)
+        '''
+    for record in locales:
+        cur.execute(sql, record)
     print(f"Inserted {len(locales)} locales")
 
 
@@ -57,8 +58,19 @@ def create_country_tables(conn):
     print("Country tables are ready")
 
 
-def insert_country_tables(conn):
+def insert_country_tables(conn, countries_sql=None, languages_sql=None, scripts_sql=None, currencies_sql=None):
     cur = conn.cursor()
+    if not countries_sql:
+        countries_sql = '''
+        INSERT INTO countries(code, long_code, name, official_name, common_name, flag)
+        VALUES(:code, :long_code, :name, :official_name, :common_name, :flag)
+        '''
+    if not languages_sql:
+        languages_sql = '''INSERT INTO languages(code, long_code, name) VALUES(:code, :long_code, :name)'''
+    if not scripts_sql:
+        scripts_sql = '''INSERT INTO scripts(code, name) VALUES(:code, :name)'''
+    if not currencies_sql:
+        currencies_sql = '''INSERT INTO currencies(code, name) VALUES(:code, :name)'''
 
     for country in pycountry.countries:
         row = {'code': country.alpha_2,
@@ -68,10 +80,7 @@ def insert_country_tables(conn):
                'common_name': getattr(country, 'common_name', None),
                'flag': getattr(country, 'flag', None)
                }
-        cur.execute('''
-        INSERT INTO countries(code, long_code, name, official_name, common_name, flag)
-        VALUES(:code, :long_code, :name, :official_name, :common_name, :flag)
-        ''', row)
+        cur.execute(countries_sql, row)
     print(f"Inserted {len(pycountry.countries)} countries")  # Inserted 249 countries
 
     for language in pycountry.languages:
@@ -80,17 +89,17 @@ def insert_country_tables(conn):
             'long_code': getattr(language, 'alpha_3', None),
             'name': language.name
         }
-        cur.execute('''INSERT INTO languages(code, long_code, name) VALUES(:code, :long_code, :name)''', row)
+        cur.execute(languages_sql, row)
     print(f"Inserted {len(pycountry.languages)} languages")  # Inserted 7847 languages
 
     for script in pycountry.scripts:
         row = {'code': script.alpha_4, 'name': script.name}
-        cur.execute('''INSERT INTO scripts(code, name) VALUES(:code, :name)''', row)
+        cur.execute(scripts_sql, row)
     print(f"Inserted {len(pycountry.scripts)} scripts")  # Inserted 182 scripts
 
     for currency in pycountry.currencies:
         row = {'code': currency.alpha_3, 'name': currency.name}
-        cur.execute('''INSERT INTO scripts(code, name) VALUES(:code, :name)''', row)
+        cur.execute(currencies_sql, row)
     print(f"Inserted {len(pycountry.currencies)} currencies")  # Inserted 170 currencies
 
 
@@ -119,10 +128,10 @@ def create_us_states_tables(conn):
     print("US states tables are ready")
 
 
-def insert_us_states_tables(conn):
+def insert_us_states_tables(conn, sql=None):
     cur = conn.cursor()
-    for state in us.states.STATES:
-        cur.execute('''INSERT INTO us_states(
+    if not sql:
+        sql = '''INSERT INTO us_states(
         abbr, 
         name,
         fips,
@@ -147,7 +156,9 @@ def insert_us_states_tables(conn):
         :capital,
         :capital_tz,
         :ap_abbr,
-        :name_metaphone)''', state.__dict__)
+        :name_metaphone)'''
+    for state in us.states.STATES:
+        cur.execute(sql, state.__dict__)
 
         for time_zone in state.time_zones:
             cur.execute('INSERT INTO us_states_time_zones(abbr, time_zone) VALUES (?, ?)', (state.abbr, time_zone))
@@ -172,20 +183,26 @@ def create_tz_tables(conn):
     print("US tz tables are ready")
 
 
-def insert_tz_tables(conn):
+def insert_tz_tables(conn, tz_sql=None, tz_countries_sql=None):
     cur = conn.cursor()
+    if not tz_sql:
+        tz_sql = 'INSERT INTO tz (zone, format, is_common) VALUES (:zone, :format, :is_common)'
+    if not tz_countries_sql:
+        tz_countries_sql = 'INSERT INTO tz_countries (country, time_zone) VALUES (:country, :time_zone)'
+
     fmt = '%Z%z'
     for tz_name in pytz.all_timezones:
         tz = pytz.timezone(tz_name)
         tz_format = datetime.now(timezone.utc).astimezone(tz).strftime(fmt)
         is_common = tz_name in pytz.common_timezones
         row = {'zone': tz_name, 'format': tz_format, 'is_common': is_common}
-        cur.execute('INSERT INTO tz (zone, format, is_common) VALUES (:zone, :format, :is_common)', row)
+        cur.execute(tz_sql, row)
     print(f"Inserted {len(pytz.all_timezones)} time zones")
 
     for country, tz_names in pytz.country_timezones.items():
         for tz_name in tz_names:
-            cur.execute('INSERT INTO tz_countries (country, time_zone) VALUES (?, ?)', (country, tz_name))
+            row = {'country': country, 'time_zone': tz_name}
+            cur.execute(tz_countries_sql, row)
     print(f"Inserted {len(pytz.country_timezones)} countries with time zones")
 
 def main():
