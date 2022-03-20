@@ -8,7 +8,7 @@ CREATE TABLE locales (
     script VARCHAR(50)
 );
 
-CREATE TABLE countries(
+CREATE TABLE c_countries(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     code CHAR(2),
     long_code CHAR(3),
@@ -17,9 +17,9 @@ CREATE TABLE countries(
     common_name VARCHAR(500),
     flag CHAR(8)
 );
-CREATE TABLE languages(id INTEGER PRIMARY KEY AUTO_INCREMENT, code CHAR(3), long_code CHAR(4), name VARCHAR(500));
-CREATE TABLE currencies(id INTEGER PRIMARY KEY AUTO_INCREMENT, code CHAR(3), name VARCHAR(500));
-CREATE TABLE scripts(id INTEGER PRIMARY KEY AUTO_INCREMENT, code CHAR(4), name VARCHAR(500));
+CREATE TABLE c_languages(id INTEGER PRIMARY KEY AUTO_INCREMENT, code CHAR(3), long_code CHAR(4), name VARCHAR(500));
+CREATE TABLE c_currencies(id INTEGER PRIMARY KEY AUTO_INCREMENT, code CHAR(3), name VARCHAR(500));
+CREATE TABLE c_scripts(id INTEGER PRIMARY KEY AUTO_INCREMENT, code CHAR(4), name VARCHAR(500));
 
 
 CREATE TABLE us_states (

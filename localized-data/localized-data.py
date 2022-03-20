@@ -50,10 +50,10 @@ def insert_locales(conn, sql=None):
 
 def create_country_tables(conn):
     conn.executescript('''
-    CREATE TABLE countries(id INTEGER PRIMARY KEY, code TEXT, long_code TEXT, name TEXT, official_name TEXT, common_name TEXT, flag TEXT);
-    CREATE TABLE languages(id INTEGER PRIMARY KEY, code TEXT, long_code TEXT, name TEXT);
-    CREATE TABLE currencies(id INTEGER PRIMARY KEY, code TEXT, name TEXT);
-    CREATE TABLE scripts(id INTEGER PRIMARY KEY, code TEXT, name TEXT);
+    CREATE TABLE c_countries(id INTEGER PRIMARY KEY, code TEXT, long_code TEXT, name TEXT, official_name TEXT, common_name TEXT, flag TEXT);
+    CREATE TABLE c_languages(id INTEGER PRIMARY KEY, code TEXT, long_code TEXT, name TEXT);
+    CREATE TABLE c_currencies(id INTEGER PRIMARY KEY, code TEXT, name TEXT);
+    CREATE TABLE c_scripts(id INTEGER PRIMARY KEY, code TEXT, name TEXT);
     ''')
     print("Country tables are ready")
 
@@ -62,15 +62,15 @@ def insert_country_tables(conn, countries_sql=None, languages_sql=None, scripts_
     cur = conn.cursor()
     if not countries_sql:
         countries_sql = '''
-        INSERT INTO countries(code, long_code, name, official_name, common_name, flag)
+        INSERT INTO c_countries(code, long_code, name, official_name, common_name, flag)
         VALUES(:code, :long_code, :name, :official_name, :common_name, :flag)
         '''
     if not languages_sql:
-        languages_sql = '''INSERT INTO languages(code, long_code, name) VALUES(:code, :long_code, :name)'''
+        languages_sql = '''INSERT INTO c_languages(code, long_code, name) VALUES(:code, :long_code, :name)'''
     if not scripts_sql:
-        scripts_sql = '''INSERT INTO scripts(code, name) VALUES(:code, :name)'''
+        scripts_sql = '''INSERT INTO c_scripts(code, name) VALUES(:code, :name)'''
     if not currencies_sql:
-        currencies_sql = '''INSERT INTO currencies(code, name) VALUES(:code, :name)'''
+        currencies_sql = '''INSERT INTO c_currencies(code, name) VALUES(:code, :name)'''
 
     for country in pycountry.countries:
         row = {'code': country.alpha_2,

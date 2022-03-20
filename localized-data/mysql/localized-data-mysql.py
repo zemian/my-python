@@ -20,12 +20,12 @@ with get_conn() as conn:
 
     localizeddata.insert_country_tables(conn,
                                         countries_sql='''
-                                        INSERT INTO countries(code, long_code, name, official_name, common_name, flag)
+                                        INSERT INTO c_countries(code, long_code, name, official_name, common_name, flag)
                                         VALUES(%(code)s, %(long_code)s, %(name)s, %(official_name)s, %(common_name)s, %(flag)s)
                                         ''',
-                                        languages_sql='INSERT INTO languages(code, long_code, name) VALUES(%(code)s, %(long_code)s, %(name)s)',
-                                        scripts_sql='INSERT INTO scripts(code, name) VALUES(%(code)s, %(name)s)',
-                                        currencies_sql='INSERT INTO currencies(code, name) VALUES(%(code)s, %(name)s)')
+                                        languages_sql='INSERT INTO c_languages(code, long_code, name) VALUES(%(code)s, %(long_code)s, %(name)s)',
+                                        scripts_sql='INSERT INTO c_scripts(code, name) VALUES(%(code)s, %(name)s)',
+                                        currencies_sql='INSERT INTO c_currencies(code, name) VALUES(%(code)s, %(name)s)')
     conn.commit()
 
     localizeddata.insert_us_states_tables(conn, states_sql='''INSERT INTO us_states(
