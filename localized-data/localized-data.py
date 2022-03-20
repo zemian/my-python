@@ -1,6 +1,8 @@
 import sqlite3
-import locale, re
+import locale
+import re
 import pycountry
+import us
 
 DB_FILE = 'localized-data.sqlite3'
 
@@ -90,6 +92,69 @@ def insert_country_tables():
             cur.execute('''INSERT INTO scripts(code, name) VALUES(:code, :name)''', row)
         print(f"Inserted {len(pycountry.currencies)} currencies")  # Inserted 170 currencies
 
+
+def create_us_states_tables():
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.executescript('''
+        CREATE TABLE us_states (
+            abbr TEXT primary key, 
+            name TEXT,
+            fips TEXT,
+            is_territory BOOLEAN,
+            is_obsolete BOOLEAN,
+            is_contiguous BOOLEAN,
+            is_continental BOOLEAN,
+            statehood_year INTEGER,
+            capital TEXT,
+            capital_tz TEXT,
+            ap_abbr TEXT,
+            name_metaphone TEXT
+        );
+        CREATE TABLE us_states_time_zones (
+            id INTEGER primary key,
+            abbr TEXT,
+            time_zone TEXT
+        );        
+        ''')
+    print("US states tables are ready")
+
+
+def insert_us_states_tables():
+    with sqlite3.connect(DB_FILE) as conn:
+        cur = conn.cursor()
+        for state in us.states.STATES:
+            cur.execute('''INSERT INTO us_states(
+            abbr, 
+            name,
+            fips,
+            is_territory,
+            is_obsolete,
+            is_contiguous,
+            is_continental,
+            statehood_year,
+            capital,
+            capital_tz,
+            ap_abbr,
+            name_metaphone
+            ) VALUES(
+            :abbr, 
+            :name,
+            :fips,
+            :is_territory,
+            :is_obsolete,
+            :is_contiguous,
+            :is_continental,
+            :statehood_year,
+            :capital,
+            :capital_tz,
+            :ap_abbr,
+            :name_metaphone)''', state.__dict__)
+
+            for time_zone in state.time_zones:
+                cur.execute('INSERT INTO us_states_time_zones(abbr, time_zone) VALUES (?, ?)', (state.abbr, time_zone))
+
+        print(f"Inserted {len(us.states.STATES)} states info.")
+
 def main():
     # Data from Python locale module
     create_locales_table()
@@ -98,6 +163,10 @@ def main():
     # Data from pycountry package
     create_country_tables()
     insert_country_tables()
+
+    # Data from us package
+    create_us_states_tables()
+    insert_us_states_tables()
 
 
 main()
