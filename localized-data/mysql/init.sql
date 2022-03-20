@@ -1,4 +1,6 @@
--- create database localized_data;
+
+-- We must create DB with UTF-8 support so that we can store country flags unicode chars!
+-- CREATE DATABASE localized_data CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE locales (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
