@@ -3,6 +3,8 @@ import locale
 import re
 import pycountry
 import us
+import pytz
+from datetime import datetime, timedelta, timezone
 
 DB_FILE = 'localized-data.sqlite3'
 
@@ -114,7 +116,7 @@ def create_us_states_tables():
             id INTEGER primary key,
             abbr TEXT,
             time_zone TEXT
-        );        
+        );
         ''')
     print("US states tables are ready")
 
@@ -155,6 +157,42 @@ def insert_us_states_tables():
 
         print(f"Inserted {len(us.states.STATES)} states info.")
 
+
+def create_tz_tables():
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.executescript('''
+        CREATE TABLE tz (
+            id INTEGER primary key, 
+            zone TEXT,
+            format TEXT,
+            is_common BOOLEAN
+        );
+        CREATE TABLE tz_countries (
+            id INTEGER primary key,
+            country TEXT,
+            time_zone TEXT
+        );
+        ''')
+    print("US tz tables are ready")
+
+
+def insert_tz_tables():
+    with sqlite3.connect(DB_FILE) as conn:
+        cur = conn.cursor()
+        fmt = '%Z%z'
+        for tz_name in pytz.all_timezones:
+            tz = pytz.timezone(tz_name)
+            tz_format = datetime.now(timezone.utc).astimezone(tz).strftime(fmt)
+            is_common = tz_name in pytz.common_timezones
+            row = {'zone': tz_name, 'format': tz_format, 'is_common': is_common}
+            cur.execute('INSERT INTO tz (zone, format, is_common) VALUES (:zone, :format, :is_common)', row)
+        print(f"Inserted {len(pytz.all_timezones)} time zones")
+
+        for country, tz_names in pytz.country_timezones.items():
+            for tz_name in tz_names:
+                cur.execute('INSERT INTO tz_countries (country, time_zone) VALUES (?, ?)', (country, tz_name))
+        print(f"Inserted {len(pytz.country_timezones)} countries with time zones")
+
 def main():
     # Data from Python locale module
     create_locales_table()
@@ -167,6 +205,10 @@ def main():
     # Data from us package
     create_us_states_tables()
     insert_us_states_tables()
+
+    # Data from pytz for timezones list
+    create_tz_tables()
+    insert_tz_tables()
 
 
 main()
