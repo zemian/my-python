@@ -51,3 +51,16 @@ select lang, count(country) country_count from locales group by lang order by co
 -- ISO8859-6,20
 -- ISO8859-15,16
 select encoding, count(encoding) encoding_count from locales group by encoding order by encoding_count desc limit 5;
+
+-- List of locale country full names
+select distinct a.country, b.name
+    from locales a left join countries b on a.country = b.code
+    where b.name is not null
+    order by a.country;
+
+-- List of locale lang full names
+select distinct a.lang, b.name
+    from locales a left join languages b on a.lang = b.code
+    where b.name is not null
+    order by a.lang;
+

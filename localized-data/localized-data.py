@@ -46,7 +46,7 @@ def create_country_tables():
     with sqlite3.connect(DB_FILE) as conn:
         conn.executescript('''
         CREATE TABLE countries(code TEXT primary key, long_code TEXT, name TEXT, official_name TEXT, common_name TEXT, flag TEXT);
-        CREATE TABLE languages(code TEXT primary key, name TEXT);
+        CREATE TABLE languages(code TEXT primary key, long_code TEXT, name TEXT);
         CREATE TABLE currencies(code TEXT primary key, name TEXT);
         CREATE TABLE scripts(code TEXT primary key, name TEXT);
         ''')
@@ -72,8 +72,12 @@ def insert_country_tables():
         print(f"Inserted {len(pycountry.countries)} countries")  # Inserted 249 countries
 
         for language in pycountry.languages:
-            row = {'code': language.alpha_3, 'name': language.name}
-            cur.execute('''INSERT INTO languages(code, name) VALUES(:code, :name)''', row)
+            row = {
+                'code': getattr(language, 'alpha_2', None),
+                'long_code': getattr(language, 'alpha_3', None),
+                'name': language.name
+            }
+            cur.execute('''INSERT INTO languages(code, long_code, name) VALUES(:code, :long_code, :name)''', row)
         print(f"Inserted {len(pycountry.languages)} languages")  # Inserted 7847 languages
 
         for script in pycountry.scripts:
@@ -87,8 +91,11 @@ def insert_country_tables():
         print(f"Inserted {len(pycountry.currencies)} currencies")  # Inserted 170 currencies
 
 def main():
+    # Data from Python locale module
     create_locales_table()
     insert_locales()
+
+    # Data from pycountry package
     create_country_tables()
     insert_country_tables()
 
