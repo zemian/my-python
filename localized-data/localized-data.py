@@ -129,10 +129,10 @@ def create_us_states_tables(conn):
     print("US states tables are ready")
 
 
-def insert_us_states_tables(conn, sql=None):
+def insert_us_states_tables(conn, states_sql=None, time_zones_sql=None):
     cur = conn.cursor()
-    if not sql:
-        sql = '''INSERT INTO us_states(
+    if not states_sql:
+        states_sql = '''INSERT INTO us_states(
         abbr, 
         name,
         fips,
@@ -158,11 +158,26 @@ def insert_us_states_tables(conn, sql=None):
         :capital_tz,
         :ap_abbr,
         :name_metaphone)'''
+    if not time_zones_sql:
+        time_zones_sql = 'INSERT INTO us_states_time_zones(abbr, time_zone) VALUES (:abbr, :time_zone)'
+
     for state in us.states.STATES:
-        cur.execute(sql, state.__dict__)
+        row = {'abbr': state.abbr,
+            'name': state.name,
+            'fips': state.fips,
+            'is_territory': state.is_territory,
+            'is_obsolete': state.is_obsolete,
+            'is_contiguous': state.is_contiguous,
+            'is_continental': state.is_continental,
+            'statehood_year': state.statehood_year,
+            'capital': state.capital,
+            'capital_tz': state.capital_tz,
+            'ap_abbr': state.ap_abbr,
+            'name_metaphone': state.name_metaphone}
+        cur.execute(states_sql, row)
 
         for time_zone in state.time_zones:
-            cur.execute('INSERT INTO us_states_time_zones(abbr, time_zone) VALUES (?, ?)', (state.abbr, time_zone))
+            cur.execute(time_zones_sql, {'abbr': state.abbr, 'time_zone': time_zone})
 
     print(f"Inserted {len(us.states.STATES)} states info.")
 
